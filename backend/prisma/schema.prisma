@@ -1,0 +1,43 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Company {
+  id        String    @id @default(cuid())
+  name      String    @db.VarChar(191)
+  createdAt DateTime  @default(now())
+  users     User[]
+  projects  Project[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  companyId String
+  email     String   @unique @db.VarChar(191)
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+}
+
+model Project {
+  id        String    @id @default(cuid())
+  companyId String
+  name      String    @db.VarChar(191)
+  budget    Decimal?  @db.Decimal(12, 2)
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+}

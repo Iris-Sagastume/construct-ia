@@ -1,43 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+enum ProjectStatus {
+  PLANIFICACION
+  EN_CURSO
+  COMPLETADO
+  CANCELADO
 }
 
 model Company {
-  id        String    @id @default(cuid())
-  name      String    @db.VarChar(191)
+  id        Int       @id @default(autoincrement())
+  tenantId  String    @unique // o @@index si prefieres
+  name      String
   createdAt DateTime  @default(now())
-  users     User[]
+  updatedAt DateTime  @updatedAt
+
+  // Relación 1:N con Project
   projects  Project[]
 }
 
-model User {
-  id        String   @id @default(cuid())
-  companyId String
-  email     String   @unique @db.VarChar(191)
-  password  String
-  role      String   @default("admin")
-  createdAt DateTime @default(now())
-
-  company Company @relation(fields: [companyId], references: [id])
-
-  @@index([companyId])
-}
-
 model Project {
-  id        String    @id @default(cuid())
-  companyId String
-  name      String    @db.VarChar(191)
-  budget    Decimal?  @db.Decimal(12, 2)
-  startDate DateTime?
-  endDate   DateTime?
-  createdAt DateTime  @default(now())
+  id          Int            @id @default(autoincrement())
+  tenantId    String
+  name        String
+  description String?         @db.Text
+  status      ProjectStatus   @default(PLANIFICACION)
 
-  company Company @relation(fields: [companyId], references: [id])
+  // Relación hacia Company (lado N)
+  companyId   Int
+  company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([tenantId])
   @@index([companyId])
 }
+

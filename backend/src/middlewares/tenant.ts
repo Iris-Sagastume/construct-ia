@@ -1,9 +1,13 @@
 // src/middlewares/tenant.ts
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 
-export function tenantGuard(req: Request, res: Response, next: NextFunction) {
-  const v = (req.header('x-tenant-id') || '').trim();
-  if (!v) return res.status(400).json({ error: 'Missing x-tenant-id header' });
-  (req as any).tenantId = v;
-  next();
+export function tenantGuard(req: Request, _res: Response, next: NextFunction) {
+  let tenant = (req.header("x-tenant-id") || "").trim();
+
+  if (!tenant) {
+    tenant = "default";
+  }
+
+  (req as any).tenantId = tenant;
+  next(); // nunca devolvemos error aquí
 }

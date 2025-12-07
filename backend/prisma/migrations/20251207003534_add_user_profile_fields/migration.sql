@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `User` ADD COLUMN `avatarUrl` VARCHAR(255) NULL,
+    ADD COLUMN `phone` VARCHAR(50) NULL;

@@ -15,31 +15,170 @@ enum ProjectStatus {
 }
 
 model Company {
-  id        Int       @id @default(autoincrement())
-  tenantId  String    @unique // o @@index si prefieres
+  id        Int      @id @default(autoincrement())
+  tenantId  String   @unique
   name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  // Relación 1:N con Project
-  projects  Project[]
+  // 1:N con Project
+  projects Project[]
 }
 
 model Project {
-  id          Int            @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   tenantId    String
   name        String
-  description String?         @db.Text
-  status      ProjectStatus   @default(PLANIFICACION)
+  description String?       @db.Text
+  status      ProjectStatus @default(PLANIFICACION)
 
-  // Relación hacia Company (lado N)
-  companyId   Int
-  company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  // N:1 con Company
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  // 1:N con Quote
+  quotes Quote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([tenantId])
   @@index([companyId])
 }
 
+model Service {
+  id          Int      @id @default(autoincrement())
+  tenantId    String
+  name        String
+  description String?
+  price       Decimal? @db.Decimal(12, 2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+enum QuoteStatus {
+  BORRADOR
+  ENVIADA
+  ACEPTADA
+  RECHAZADA
+}
+
+model Quote {
+  id         Int         @id @default(autoincrement())
+  tenantId   String
+  projectId  Int
+  clientName String
+  total      Decimal?    @db.Decimal(12, 2)
+  status     QuoteStatus @default(BORRADOR)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  // N:1 con Project
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([projectId])
+}
+
+model HouseDesign {
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  tipoCasa         String
+  areaVaras        Int
+  habitaciones     Int
+  banos            Int
+  departamento     String
+  municipio        String
+  colonia          String
+  piscina          String      // "Sí" / "No" — coincide con tu BD real
+  notasAdicionales String?
+
+  // Imagen generada por IA
+  imageUrl         String   @db.LongText
+
+  // Render generado por IA
+  renderUrl        String?  @db.LongText
+
+  // Costo aproximado (aunque el nombre original decía USD)
+  estimatedCostUsd Float
+
+  // Relación con PreQuote
+  preQuotes        PreQuote[]
+}
+
+enum UserRole {
+  CLIENTE
+  ADMIN
+  CONSTRUCTORA
+  FERRETERIA
+  BANCO
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  firebaseUid String   @unique
+  email       String   @unique
+  name        String?
+  phone       String?    @db.VarChar(50)   // 👈 nuevo campo contacto
+  avatarUrl   String?    @db.VarChar(255)  // 👈 nuevo campo foto (URL)
+  role        UserRole @default(CLIENTE)
+  createdAt   DateTime @default(now())
+
+  // Relación con PreQuote
+  preQuotes   PreQuote[]
+}
+
+model PreQuote {
+  id                    Int         @id @default(autoincrement())
+  createdAt             DateTime    @default(now())
+
+  ticket                String      @unique
+  estimatedCostLps      Int
+
+  builder               String?     // constructora
+  ferreteria            String?
+  bankName              String?
+  bankRate              Float?
+
+  contactEmail          String
+  contactPhone          String
+  contactMode           String      // PRESENCIAL / VIRTUAL
+  contactPlace          String?     // si es presencial
+  contactVirtualOption  String?     // WhatsApp / Zoom / Google Meet
+
+  status                String      @default("PENDIENTE")
+
+  // Relaciones
+  user                  User?       @relation(fields: [userId], references: [id])
+  userId                Int?
+
+  houseDesign           HouseDesign @relation(fields: [houseDesignId], references: [id])
+  houseDesignId         Int
+
+  @@index([contactEmail])
+  @@index([userId])
+  @@index([houseDesignId])
+}
+enum SolicitudTipo {
+  CONSTRUCTORA
+  FERRETERIA
+  BANCO
+}
+
+enum SolicitudEstado {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+}
+
+model Solicitud {
+  id          Int             @id @default(autoincrement())
+  tipo        SolicitudTipo
+  nombre      String
+  tasaInteres Float?
+  email       String
+  estado      SolicitudEstado @default(PENDIENTE)
+  createdAt   DateTime        @default(now())
+}

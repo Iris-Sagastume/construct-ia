@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Construct IA</title>
+  <!-- fondo -->
+  <rect width="64" height="64" rx="12" fill="#0b1120"></rect>
+
+  <g transform="translate(10,14)">
+    <!-- casa / construcción -->
+    <path d="M6 18 L22 6 L38 18" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+    <rect x="12" y="18" width="20" height="18" rx="3" fill="none" stroke="#2563eb" stroke-width="3"></rect>
+    <rect x="19" y="22" width="6" height="8" rx="1" fill="#2563eb"></rect>
+
+    <!-- chip / IA -->
+    <rect x="32" y="14" width="12" height="12" rx="3" fill="#0b1120" stroke="#38bdf8" stroke-width="2"></rect>
+    <circle cx="38" cy="20" r="2" fill="#38bdf8"></circle>
+
+    <!-- conexiones tipo circuito -->
+    <line x1="38" y1="4" x2="38" y2="14" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"></line>
+    <circle cx="38" cy="4" r="2" fill="#38bdf8"></circle>
+
+    <line x1="28" y1="20" x2="32" y2="20" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"></line>
+    <circle cx="28" cy="20" r="2" fill="#38bdf8"></circle>
+
+    <line x1="38" y1="26" x2="38" y2="36" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"></line>
+    <circle cx="38" cy="36" r="2" fill="#38bdf8"></circle>
+  </g>
+</svg>
